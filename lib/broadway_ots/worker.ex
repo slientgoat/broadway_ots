@@ -25,6 +25,8 @@ defmodule BroadwayOts.Worker do
   @status_close W.close()
   @status_terminated W.terminated()
 
+  @err_client_not_exist "OTSResourceGone [tunnelservice] client not exist"
+
   def channels_merge([], new),
     do:
       new
@@ -86,10 +88,10 @@ defmodule BroadwayOts.Worker do
         state = batch_update_channel_state_machine(state, new_channels)
         Process.send_after(self(), :heartbeat, heartbeat_interval)
         {:noreply, state}
-
+      {:error, @err_client_not_exist} ->
+        {:stop, :normal, state}
       {:error, reason} ->
-        # restart the current worker
-        {:stop, inspect(reason)}
+        {:stop, inspect(reason), state}
     end
   end
 
@@ -105,6 +107,10 @@ defmodule BroadwayOts.Worker do
 
   def handle_cast(_msg, state) do
     {:noreply, state}
+  end
+
+  def terminate(:normal, state) do
+    :ok
   end
 
   def terminate(_reason, state) do
