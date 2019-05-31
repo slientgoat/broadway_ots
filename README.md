@@ -29,7 +29,7 @@ be found at [https://hexdocs.pm/broadway_ots](https://hexdocs.pm/broadway_ots).
    1. Define your instance configuration,you can see more in `ex_aliyun_ots/README.md`
    2. Define your tunnel configuration
    3. Define a customer module to process data
-   4. Add it to your application's supervision tree
+   
  ### Simple Example
  Here the simplest example to show how to use tunnel sdk.
  Please define required configuration in `your_project/configs/xxx.exs`,mostly like this:
@@ -53,7 +53,7 @@ be found at [https://hexdocs.pm/broadway_ots](https://hexdocs.pm/broadway_ots).
    tunnels: [CustomerExample]
  config :broadway_ots, CustomerExample,
    tunnel_config: %{
-     instance: EDCEXTestInstance,
+     instance: MyInstance,
      table_name: "pxy_test",
      tunnel_name: "add2"
    }
@@ -91,7 +91,7 @@ be found at [https://hexdocs.pm/broadway_ots](https://hexdocs.pm/broadway_ots).
    tunnels: [CustomerExample]
  config :broadway_ots, CustomerExample,
    tunnel_config: %{
-     instance: EDCEXTestInstance,
+     instance: MyInstance,
      table_name: "pxy_test",
      tunnel_name: "add2",
      heartbeat_timeout: 30,
@@ -119,7 +119,6 @@ be found at [https://hexdocs.pm/broadway_ots](https://hexdocs.pm/broadway_ots).
    
      import Integer
    
-     # 被Broadway.Processor调用
      def handle_message(_, message, _) do
        message
        |> Message.update_data(&process_data/1)
@@ -139,7 +138,6 @@ be found at [https://hexdocs.pm/broadway_ots](https://hexdocs.pm/broadway_ots).
        Message.put_batcher(message, :s3)
      end
    
-     # 被Broadway.Consumer调用
      def handle_batch(:sqs, messages, _batch_info, _context) do
        IO.inspect(messages |> Enum.map(& &1.data), label: "length,#{length(messages)}-sqs")
        messages
